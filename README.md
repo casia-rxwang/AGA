@@ -4,3 +4,6 @@ This repository contains the official code used for the paper **Graph Convolutio
 
 Please contact the author if you have any questions or need to access pre-trained model parameters.
 
+
+
+**Last update: 2025.5.17**
