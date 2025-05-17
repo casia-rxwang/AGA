@@ -110,6 +110,8 @@ def get_parser():
     parser.add_argument('--layer_drop', type=float, default=0.0, help='layer_drop')
     parser.add_argument('--weight_decay', type=float, default=0.0, help='weight_decay')
     parser.add_argument('--train_eps', action='store_true', help='eps in GIN')
+    parser.add_argument('--tau', type=float, default=10.0, help='temperature')
+    parser.add_argument('--gamma', type=float, default=1.0, help='degree of freedom')
     return parser
 
 

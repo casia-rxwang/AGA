@@ -64,14 +64,14 @@ class Attention(torch.nn.Module):
 
 
 class Label_Histogram(torch.nn.Module):
-    def __init__(self, in_size: int, out_size: int, num_cluster: int, agg_q: Callable, heads: int = 1, tau: float = 1., t: float = 10.):
+    def __init__(self, in_size: int, out_size: int, num_cluster: int, agg_q: Callable, heads: int = 1, gamma: float = 1., tau: float = 10.):
         super(Label_Histogram, self).__init__()
         self.in_size = in_size
         self.out_size = out_size
         self.num_cluster = num_cluster
         self.heads = heads
+        self.gamma = gamma
         self.tau = tau
-        self.t = t
 
         self.k = Parameter(torch.empty(heads, num_cluster, in_size))
         # self.lin = Linear(heads, 1, bias=True)
@@ -90,13 +90,13 @@ class Label_Histogram(torch.nn.Module):
         N, H, K, D = x.size(0), self.heads, self.num_cluster, self.in_size
 
         dist = torch.cdist(self.k.view(H * K, D), x, p=2)**2
-        dist = (1. + dist / self.tau).pow(-(self.tau + 1.0) / 2.0)
+        dist = (1. + dist / self.gamma).pow(-(self.gamma + 1.0) / 2.0)
 
         dist = dist.view(H, K, N).permute(2, 1, 0)  # [N, K, H]
 
         # w = dist / dist.sum(dim=-2, keepdim=True)
         # w = self.lin(w).squeeze(dim=-1).softmax(dim=-1)
-        w = dist / dist.sum(dim=-2, keepdim=True) * self.t
+        w = dist / dist.sum(dim=-2, keepdim=True) * self.tau
         w = w.mean(dim=-1, keepdim=False).softmax(dim=-1)  # [N, K]
 
         new_msg = torch.mul(w.unsqueeze(dim=-1), msg.unsqueeze(dim=-2)).view(N, K * D_)  # [N, KD]
@@ -139,7 +139,7 @@ def create_mp_weight(hidden, args, depth):
     elif mp_agg == 'att':
         return Attention(hidden + in_size, agg_q)
     elif mp_agg == 'lha' and K > 1 and depth == args.num_layers:
-        return Label_Histogram(in_size, hidden, K, agg_q)
+        return Label_Histogram(in_size, hidden, K, agg_q, gamma=args.gamma, tau=args.tau)
     elif mp_agg == 'mlp' and K > 1 and depth == args.num_layers:
         return MLP(in_size, hidden, K, agg_q)
     else:
