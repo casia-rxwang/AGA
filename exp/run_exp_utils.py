@@ -364,7 +364,7 @@ def load_model(model_path, model, optimizer=None, scheduler=None, resume=False):
     state_dict = checkpoint['state_dict']
     start_epoch = checkpoint['epoch']
 
-    missing_keys, unexpected_keys = model.load_state_dict(state_dict, strict=False)
+    missing_keys, unexpected_keys = model.load_state_dict(state_dict, strict=True)
     for k in missing_keys:
         print('missing parameter {}.'.format(k))
     for k in unexpected_keys:

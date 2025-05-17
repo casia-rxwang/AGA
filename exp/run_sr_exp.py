@@ -75,13 +75,11 @@ if __name__ == "__main__":
                 '-----------------------------------------------\n')
     print(msg)
 
-    if args.exp_mode == 'eval':
-        # not save results
-        exit()
+    suffix = 'result_eval.txt' if args.exp_mode == 'eval' else 'result.txt'
 
     # additionally write msg and configuration on file
     msg += str(args)
-    filename = os.path.join(result_folder, 'result.txt')
+    filename = os.path.join(result_folder, suffix)
     print('Writing results at: {}'.format(filename))
     with open(filename, 'w') as handle:
         handle.write(msg)

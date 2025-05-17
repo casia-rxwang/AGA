@@ -256,11 +256,13 @@ def eval_mode(args, model, device, train_loader, valid_loader, test_loader, eval
     final_train_perf = np.nan
     final_val_perf = np.nan
     final_test_perf = np.nan
-    if not args.dataset.startswith('sr'):
-        final_train_perf, _ = eval(model, device, train_loader, evaluator, args.task_type)
-        final_val_perf, _ = eval(model, device, valid_loader, evaluator, args.task_type)
+    # if not args.dataset.startswith('sr'):
+    #     final_train_perf, _ = eval(model, device, train_loader, evaluator, args.task_type)
+    #     final_val_perf, _ = eval(model, device, valid_loader, evaluator, args.task_type)
     if test_loader is not None:
         final_test_perf, _ = eval(model, device, test_loader, evaluator, args.task_type)
+    else:
+        final_val_perf, _ = eval(model, device, valid_loader, evaluator, args.task_type)
 
     curves = {
         'train_loss': [np.nan],
